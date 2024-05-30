@@ -1,0 +1,861 @@
+type: edu
+files:
+  - name: src/main/java/org/hyperskill/aquarium/MainActivity.kt
+    visible: true
+    text: |
+      package org.hyperskill.aquarium
+      
+      import androidx.appcompat.app.AppCompatActivity
+      import android.os.Bundle
+      
+      class MainActivity : AppCompatActivity() {
+          override fun onCreate(savedInstanceState: Bundle?) {
+              super.onCreate(savedInstanceState)
+              setContentView(R.layout.activity_main)
+          }
+      }
+    learner_created: false
+  - name: src/main/res/drawable/error.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/drawable/ic_launcher_background.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/drawable/image1.png
+    visible: true
+    learner_created: false
+  - name: src/main/res/drawable/placeholder.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/drawable-v24/ic_launcher_foreground.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/layout/activity_main.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/values/colors.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/values/strings.xml
+    visible: true
+    learner_created: false
+  - name: src/main/res/values/styles.xml
+    visible: true
+    learner_created: false
+  - name: src/main/AndroidManifest.xml
+    visible: true
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/internals/data/AquariumFakeData.kt
+    visible: false
+    text: |-
+      package org.hyperskill.aquarium.internals.data
+      
+      import org.hyperskill.aquarium.R
+      
+      object AquariumFakeData {
+      
+          val fakeListImageResources = listOf(
+                  R.drawable.image1
+          )
+      
+          val fakeListImageUrls = listOf(
+                  "https://ucarecdn.com/42045846-b968-4a88-81ec-df73bec4fcb7/",
+                  "https://ucarecdn.com/5aa10eb3-fc49-4304-9057-adf1d29a9b4c/",
+                  "https://ucarecdn.com/c5fd39b9-7690-4616-b7dc-d3f8da883146/"
+          )
+      
+          val fakeListNames = listOf(
+                  "Koi Carp", "Spiny Dogfish", "Kaluga"
+          )
+      
+          val fakeListDescriptions = listOf(
+                  //Koi Carp
+                  "These colorful, ornamental fish are a variety of the Amur carp. " +
+                          "They were originally found in Central Europe and Asia, " +
+                          "but they’ve spread to many other parts of the world. " +
+                          "Koi carp are popular with breeders, and there are currently over 100 varieties " +
+                          "created through breeding.\n" +
+                          "\n" +
+                          "The average age of a koi carp can vary based on the part of the world it’s bred in. " +
+                          "Carps bred outside of Japan have an average lifespan of around 15 years," +
+                          " while carps bred in Japan can live 40 years or more. The oldest koi carp on record," +
+                          " which was a fish named Hanako, reportedly lived for 226 years!",
+                  // Spiny dogfish
+                  "The spiny dogfish is a type of shark with venomous spines in front of its dorsal fins." +
+                          " Not only is it an aggressive hunter, but these fish are known to hunt in packs!" +
+                          " Like many shark species, these fish grow slowly, " +
+                          "and some females don’t reach full maturity until they’re over 30 years old.\n" +
+                          "\n" +
+                          "While the lifespan of the spiny dogfish is already impressive, " +
+                          "some fish live for far longer than average. " +
+                          "Spiny dogfish in the Pacific Ocean tend to live longer than fish in the Atlantic," +
+                          " with some fish living longer than 80 years. " +
+                          "Females tend to mature later than males, and they usually live longer too.",
+                  //Kaluga
+                  "Sometimes called the river beluga, the kaluga is a type of predatory sturgeon." +
+                          " While these fish spend the majority of their time in freshwater, " +
+                          "they’re also able to survive in salt water. " +
+                          "The kaluga is one of the world’s largest freshwater fish species and can grow to be more than 18 feet long, " +
+                          "with a weight of over 2,200 pounds.\n" +
+                          "\n" +
+                          "Kalugas are overfished, which has left the species vulnerable to extinction. " +
+                          "Although many kaluga are killed before they fully mature, " +
+                          "these fish have the potential to live very long lives. " +
+                          "One kaluga that was caught in China is estimated to be over 100 years old."
+          )
+      }
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/internals/screen/PageScreen.kt
+    visible: false
+    text: |-
+      package org.hyperskill.aquarium.internals.screen
+      
+      import android.app.Activity
+      import android.graphics.Typeface
+      import android.widget.ImageView
+      import android.widget.TextView
+      import androidx.cardview.widget.CardView
+      import androidx.core.widget.NestedScrollView
+      import org.hyperskill.aquarium.R
+      import org.hyperskill.aquarium.internals.AquariumTest
+      import org.hyperskill.aquarium.internals.shadow.CustomShadowPicasso
+      import org.hyperskill.aquarium.internals.shadow.CustomShadowRequestCreator
+      import org.junit.Assert.assertEquals
+      import org.junit.Assert.assertNotNull
+      import org.robolectric.shadow.api.Shadow
+      
+      
+      class PageScreen<T : Activity>(private val test: AquariumTest<T>, initViews: Boolean = true) {
+      
+          companion object {
+              const val ID_CARD_VIEW = "card_view"
+              const val ID_IMAGE_VIEW = "image_view"
+              const val ID_TV_NAME = "tv_name"
+              const val ID_TV_DESCRIPTION = "tv_description"
+              const val ID_NESTED_SCROLL_VIEW = "scroll_view"
+          }
+      
+          val cardView: CardView by lazy {
+              with(test) {
+                  activity.findViewByString<CardView>(ID_CARD_VIEW).apply {
+                      assertCornerRadius(expectedRadius = 15f)
+                      assertElevation(expectedElevation = 10f)
+                  }
+              }
+          }
+      
+          val nestedScrollView: NestedScrollView by lazy {
+              with(test) {
+                  cardView.findViewByString(ID_NESTED_SCROLL_VIEW)
+              }
+          }
+      
+          val imageView: ImageView by lazy {
+              with(test) {
+                  cardView.findViewByString(ID_IMAGE_VIEW)
+              }
+          }
+      
+          val tvName: TextView by lazy {
+              with(test) {
+                  cardView.findViewByString<TextView>(ID_TV_NAME).apply {
+                      assertAppearanceMaterialBody1(ID_TV_NAME)
+                      assertFontFamily(ID_TV_NAME, "monospace")
+                      assertTextStyle(ID_TV_NAME, Typeface.BOLD)
+                  }
+              }
+          }
+      
+          val tvDescription: TextView by lazy {
+              with(test) {
+                  nestedScrollView.findViewByString<TextView>(ID_TV_DESCRIPTION).apply {
+                      assertAppearanceMaterialBody2(ID_TV_DESCRIPTION)
+                      assertFontFamily(ID_TV_DESCRIPTION, "sans-serif")
+                      assertTextStyle(ID_TV_NAME, Typeface.NORMAL)
+                  }
+              }
+          }
+      
+          init {
+              if (initViews) {
+                  cardView
+                  tvDescription
+                  tvName
+                  imageView
+                  nestedScrollView
+              }
+          }
+      
+      
+          fun assertImageViewResource(expectedImageId: Int, expectedImageIdString: String) = with(test) {
+              imageView.drawable.assertEquals(
+                  message = "Incorrect drawable set on $ID_IMAGE_VIEW",
+                  expectedResourceId = expectedImageId,
+                  expectedResourceIdString = expectedImageIdString
+              )
+          }
+      
+          fun assertImageViewScale() = with(test) {
+              val expectedScaleType = ImageView.ScaleType.CENTER_CROP
+              val scaleType = imageView.scaleType
+              val errorMessage =
+                  "on $ID_IMAGE_VIEW expected CENTER_CROP with ScaleType, but was ${scaleType.name}"
+              assertEquals(errorMessage, expectedScaleType.name, scaleType.name)
+          }
+      
+          fun assertPageTextContent(
+              caseDescription: String,
+              expectedName: String,
+              expectedDescription: String
+          ) = with(test) {
+              tvName.assertText(expectedName, ID_TV_NAME, caseDescription)
+              tvDescription.assertText(expectedDescription, ID_TV_DESCRIPTION, caseDescription)
+          }
+      
+          fun assertPageImageRequest(
+              caseDescription: String,
+              imageUrls: List<String>,
+              pageIndex: Int
+          ) = with(test) {
+      
+              if(pageIndex !in imageUrls.indices) {
+                  throw IllegalArgumentException(
+                      "Test tried to make assertion with invalid index. Test needs to be fixed"
+                  )
+              }
+      
+              val expectedImageUrl = imageUrls[pageIndex]
+              val request = CustomShadowPicasso.requestMap[expectedImageUrl]
+              val messageRequestNull = "$caseDescription, expected to be on page $pageIndex " +
+                      "and to have a request for url $expectedImageUrl"
+              assertNotNull(messageRequestNull, request)
+      
+              val requestShadow = Shadow.extract<CustomShadowRequestCreator>(request)
+              val actualImageView = requestShadow.imageViewLoaded
+              val messageImageView =
+                  "$caseDescription, expected image to be loaded into $ID_IMAGE_VIEW"
+      
+              assertEquals(messageImageView, imageView, actualImageView)
+      
+              val messagePlaceholderIdError =
+                  "$caseDescription, expected placeholder to be set with R.drawable.placeholder"
+              val expectedPlaceholderId = R.drawable.placeholder
+              val actualPlaceholderId = requestShadow.placeholderId
+              assertEquals(messagePlaceholderIdError, expectedPlaceholderId, actualPlaceholderId)
+      
+              val messageErrorIdError =
+                  "$caseDescription, expected error to be set with R.drawable.error"
+              val expectedErrorId = R.drawable.error
+              val actualErrorId = requestShadow.errorId
+              assertEquals(messageErrorIdError, expectedErrorId, actualErrorId)
+          }
+      }
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/internals/shadow/CustomShadowAsyncDifferConfig.java
+    visible: false
+    text: |+
+      package org.hyperskill.aquarium.internals.shadow;
+      
+      import android.os.Handler;
+      import android.os.Looper;
+      
+      import androidx.recyclerview.widget.AsyncDifferConfig;
+      
+      import org.robolectric.annotation.Implementation;
+      import org.robolectric.annotation.Implements;
+      
+      import java.util.concurrent.Executor;
+      
+      // Version 1.1
+      @Implements(AsyncDifferConfig.class)
+      @SuppressWarnings({"unused"})
+      public class CustomShadowAsyncDifferConfig {
+      
+          public static class MainThreadExecutor implements Executor {
+              private final Handler handler = new Handler(Looper.getMainLooper());
+      
+              @Override
+              public void execute(Runnable r) {
+                  handler.post(r);
+              }
+          }
+          Executor mainExecutor;
+      
+          @Implementation
+          public Executor getBackgroundThreadExecutor() {
+              if(mainExecutor == null) {
+                  mainExecutor = new MainThreadExecutor();
+              }
+              return mainExecutor;
+          }
+      }
+    
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/internals/shadow/CustomShadowPicasso.kt
+    visible: false
+    text: |-
+      package org.hyperskill.aquarium.internals.shadow
+      
+      import android.content.Context
+      import android.net.Uri
+      import com.squareup.picasso.Picasso
+      import com.squareup.picasso.PicassoProvider
+      import com.squareup.picasso.RequestCreator
+      import org.robolectric.annotation.Implementation
+      import org.robolectric.annotation.Implements
+      import org.robolectric.annotation.RealObject
+      
+      // Version 1.1
+      @Suppress("UNUSED", "UNUSED_PARAMETER")
+      @Implements(Picasso::class)
+      class CustomShadowPicasso {
+      
+          companion object {
+      
+              private var _requestMap:  MutableMap<String, RequestCreator> = mutableMapOf()
+              val requestMap: Map<String, RequestCreator>
+                  get() = _requestMap
+      
+              fun setSingletonNull() {
+                  val field = Picasso::class.java.getDeclaredField("singleton")
+                  field.isAccessible = true
+                  field.set(null, null)
+              }
+      
+              fun setContext(context: Context) {
+                  val field = PicassoProvider::class.java.getDeclaredField("context")
+                  field.isAccessible = true
+                  field.set(null, context)
+              }
+      
+              fun clearRequests() {
+                  _requestMap.clear()
+              }
+          }
+      
+          @RealObject
+          lateinit var picasso: Picasso
+      
+          @Implementation
+          fun load(uri: Uri): RequestCreator {
+      
+              val constructor = RequestCreator::class.java.getDeclaredConstructor(
+                  Picasso::class.java,
+                  Uri::class.java,
+                  Int::class.java
+              )
+              constructor.isAccessible = true
+              val requestCreator = constructor.newInstance(picasso, uri, 0)
+      
+              _requestMap[uri.toString()] = requestCreator
+      
+              return requestCreator
+          }
+      }
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/internals/shadow/CustomShadowRequestCreator.kt
+    visible: false
+    text: |-
+      package org.hyperskill.aquarium.internals.shadow
+      
+      import android.app.Notification
+      import android.graphics.drawable.Drawable
+      import android.widget.ImageView
+      import android.widget.RemoteViews
+      import androidx.annotation.DrawableRes
+      import androidx.annotation.IdRes
+      import com.squareup.picasso.Callback
+      import com.squareup.picasso.RequestCreator
+      import com.squareup.picasso.Target
+      import org.robolectric.Shadows.shadowOf
+      import org.robolectric.annotation.Implementation
+      import org.robolectric.annotation.Implements
+      import org.robolectric.annotation.RealObject
+      import org.robolectric.shadow.api.Shadow
+      import org.robolectric.util.ReflectionHelpers.ClassParameter
+      
+      @Suppress("UNUSED", "UNUSED_PARAMETER")
+      @Implements(RequestCreator::class)
+      class CustomShadowRequestCreator {
+      
+          @RealObject
+          lateinit var requestCreator: RequestCreator
+          var imageViewLoaded : ImageView? = null
+          var callback : Callback? = null
+          var placeholderId : Int? = null
+          var errorId : Int? = null
+      
+          @Implementation
+          fun into(imageView: ImageView, callback: Callback?) {
+              imageViewLoaded = imageView
+              this.callback = callback
+          }
+      
+          @Implementation
+          fun into(remoteViews: RemoteViews, @IdRes viewId: Int, appWidgetIds: IntArray, callback: Callback?) {
+      
+              throw AssertionError(
+                  "method .into() with RemoteViews argument " +
+                          "is not supported for this project tests"
+              )
+          }
+      
+          @Implementation
+          fun into(
+              remoteViews: RemoteViews, @IdRes viewId: Int, notificationId: Int,
+              notification: Notification, notificationTag: String?, callback: Callback?,
+          ) {
+              throw AssertionError(
+                  "method .into() with RemoteViews argument " +
+                          "is not supported for this project tests"
+              )
+          }
+      
+          @Implementation
+          fun into(target: Target) {
+              throw AssertionError(
+                  "method .into() with Target argument " +
+                          "is not supported for this project tests"
+              )
+          }
+      
+          @Implementation
+          fun placeholder(@DrawableRes placeholderResId: Int): RequestCreator {
+              // calling real placeholder
+              val parameter = ClassParameter.from(Int::class.java, placeholderResId)
+              Shadow.directlyOn<RequestCreator, RequestCreator>(
+                  requestCreator,
+                  requestCreator.javaClass,
+                  "placeholder",
+                  parameter
+              )
+      
+              placeholderId = placeholderResId
+              return requestCreator
+          }
+      
+          fun placeholder(placeholderDrawable: Drawable): RequestCreator {
+              val placeholderId = shadowOf(placeholderDrawable).createdFromResId
+              return requestCreator.placeholder(placeholderId)
+          }
+      
+          fun error(@DrawableRes errorResId: Int): RequestCreator {
+              // calling real error
+              val parameter = ClassParameter.from(Int::class.java, errorResId)
+              Shadow.directlyOn<RequestCreator, RequestCreator>(
+                  requestCreator,
+                  requestCreator.javaClass,
+                  "error",
+                  parameter
+              )
+              errorId = errorResId
+              return requestCreator
+          }
+      
+          fun error(errorDrawable: Drawable): RequestCreator {
+              val errorId = shadowOf(errorDrawable).createdFromResId
+              return requestCreator.error(errorId)
+          }
+      }
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/internals/AbstractUnitTest.kt
+    visible: false
+    text: |-
+      package org.hyperskill.aquarium.internals
+      
+      import android.app.Activity
+      import android.app.AlertDialog
+      import android.content.Intent
+      import android.os.Bundle
+      import android.view.View
+      import org.junit.Assert.*
+      import org.robolectric.Robolectric
+      import org.robolectric.Shadows.shadowOf
+      import org.robolectric.android.controller.ActivityController
+      import org.robolectric.shadow.api.Shadow
+      import org.robolectric.shadows.ShadowActivity
+      import org.robolectric.shadows.ShadowAlertDialog
+      import org.robolectric.shadows.ShadowLooper
+      import org.robolectric.shadows.ShadowToast
+      import java.time.Duration
+      
+      abstract class AbstractUnitTest<T : Activity>(clazz: Class<T>) {
+      
+          /**
+           * Setup and control activities and their lifecycle
+           */
+          val activityController: ActivityController<T> by lazy {
+              Robolectric.buildActivity(clazz)
+          }
+      
+          /**
+           * The activity being tested.
+           *
+           * It is the @RealObject of the shadowActivity
+           */
+          val activity : Activity by lazy {
+              activityController.get()
+          }
+      
+          /**
+           * A Roboletric shadow object of the Activity class, contains helper methods to deal with
+           * testing activities like setting permissions, peeking results of launched activities for result,
+           * retrieving shown dialogs, intents and others.
+           *
+           * If you don't know what shadows are you can have a better understanding on that reading this
+           * on roboletric documentation: http://robolectric.org/extending/
+           *
+           * Understanding Shadows is fundamental for Roboletric, things are not what they appear to be on
+           * Roboletric because running a code on the jvm is not the same as running the code on a real/emulated device.
+           * Code that expects to eventually talk to the machine won't have the machine they expect to have to talk to.
+           * Shadow is how Roboletric makes things possible, they impersonate @RealObject and act when @RealObject is expected to act.
+           *
+           * Things in Roboletric are not what they appear to be.
+           * It is possible to not notice it for the most part, but it will be essential for some other parts
+           */
+          val shadowActivity: ShadowActivity by lazy {
+              Shadow.extract(activity)
+          }
+      
+          /**
+           * A Roboletric shadow object of the mainLooper. Handles enqueued runnables and also the passage of time.
+           *
+           * Usually used with .idleFor(someDurationValue) or .runToEndOfTasks()
+           */
+          val shadowLooper: ShadowLooper by lazy {
+              shadowOf(activity.mainLooper)
+          }
+      
+          /**
+           * Sets up activity for tests and ensures better error messages displayed
+           * when tests are run with check button and exceptions are thrown by user implementation.
+           *
+           * returns a value for convenience use, like in tests that involve navigation between Activities
+           */
+          fun <ReturnValue> testActivity(
+              arguments: Intent = Intent(),
+              savedInstanceState: Bundle? = null,
+              testCodeBlock: (Activity) -> ReturnValue
+          ): ReturnValue {
+              try {
+                  activity.intent = arguments
+                  if (savedInstanceState == null) {
+                      activityController.setup()
+                  } else {
+                      activityController.setup(savedInstanceState)
+                  }
+              } catch (ex: Exception) {
+                  throw AssertionError("Exception, test failed on activity creation with $ex\n${ex.stackTraceToString()}")
+              }
+      
+              return try {
+                  testCodeBlock(activity)
+              } catch (ex: Exception) {
+                  throw AssertionError("Exception. Test failed on activity execution with $ex\n${ex.stackTraceToString()}")
+              }
+          }
+      
+          /**
+           * Use this method to find views.
+           *
+           * The view existence will be assert before being returned
+           */
+          inline fun <reified T> Activity.findViewByString(idString: String): T {
+              val id = this.resources.getIdentifier(idString, "id", this.packageName)
+              val view: View? = this.findViewById(id)
+      
+              val idNotFoundMessage = "View with id \"$idString\" was not found"
+              val wrongClassMessage = "View with id \"$idString\" is not from expected class. " +
+                      "Expected ${T::class.java.simpleName} found ${view?.javaClass?.simpleName}"
+      
+              assertNotNull(idNotFoundMessage, view)
+              assertTrue(wrongClassMessage, view is T)
+      
+              return view as T
+          }
+      
+          /**
+           * Use this method to find views.
+           *
+           * The view existence will be assert before being returned
+           */
+          inline fun <reified T> View.findViewByString(idString: String): T {
+              val id = this.resources.getIdentifier(idString, "id", context.packageName)
+              val view: View? = this.findViewById(id)
+      
+              val idNotFoundMessage = "View with id \"$idString\" was not found"
+              val wrongClassMessage = "View with id \"$idString\" is not from expected class. " +
+                      "Expected ${T::class.java.simpleName} found ${view?.javaClass?.simpleName}"
+      
+              assertNotNull(idNotFoundMessage, view)
+              assertTrue(wrongClassMessage, view is T)
+      
+              return view as T
+          }
+      
+          /**
+           * Use this method to perform clicks. It will also advance the clock millis milliseconds and run
+           * enqueued Runnable scheduled to run on main looper in that timeframe.
+           * Default value for millis is 500
+           *
+           * Internally it calls performClick() and shadowLooper.idleFor(millis)
+           */
+          fun View.clickAndRun(millis: Long = 500){
+              this.performClick()
+              shadowLooper.idleFor(Duration.ofMillis(millis))
+          }
+      
+          /**
+           * Asserts that the last message toasted is the expectedMessage.
+           * Assertion fails if no toast is shown with null actualLastMessage value.
+           */
+          fun assertLastToastMessageEquals(errorMessage: String, expectedMessage: String,) {
+              val actualLastMessage: String? = ShadowToast.getTextOfLatestToast()
+              assertEquals(errorMessage, expectedMessage, actualLastMessage)
+          }
+      
+          /**
+           * Use this method to retrieve the latest AlertDialog.
+           *
+           * The existence of such AlertDialog will be asserted before returning.
+           *
+           * Robolectric only supports android.app.AlertDialog, test will not be
+           * able to find androidx.appcompat.app.AlertDialog.
+           *
+           * - Important!!! :
+           * When writing stage description state explicitly the correct version that should be imported
+           */
+          fun getLatestDialog(): AlertDialog {
+              val latestAlertDialog = ShadowAlertDialog.getLatestAlertDialog()
+      
+              assertNotNull(
+                  "There was no AlertDialog found. Make sure to import android.app.AlertDialog version",
+                  latestAlertDialog
+              )
+      
+              return latestAlertDialog!!
+          }
+      }
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/internals/AquariumTest.kt
+    visible: false
+    text: |-
+      package org.hyperskill.aquarium.internals
+      
+      import android.app.Activity
+      import android.content.Intent
+      import android.graphics.drawable.Drawable
+      import android.widget.TextView
+      import androidx.cardview.widget.CardView
+      import com.google.android.material.tabs.TabLayout
+      import org.hyperskill.aquarium.internals.data.AquariumFakeData.fakeListDescriptions
+      import org.hyperskill.aquarium.internals.data.AquariumFakeData.fakeListImageResources
+      import org.hyperskill.aquarium.internals.data.AquariumFakeData.fakeListImageUrls
+      import org.hyperskill.aquarium.internals.data.AquariumFakeData.fakeListNames
+      import org.junit.Assert
+      import org.junit.Assert.assertEquals
+      import org.robolectric.Shadows.shadowOf
+      import java.util.concurrent.TimeUnit
+      
+      open class AquariumTest<T : Activity>(clazz: Class<T>) : AbstractUnitTest<T>(clazz) {
+      
+      
+          val stage1Args by lazy {
+              Intent().apply {
+                  putExtra("imageAnimals", fakeListImageResources.take(1) as java.io.Serializable)
+                  putExtra("nameAnimals", fakeListNames.take(1) as java.io.Serializable)
+                  putExtra("descriptionAnimals", fakeListDescriptions.take(1) as java.io.Serializable)
+              }
+          }
+      
+          val stage2Args by lazy {
+              Intent().apply {
+                  putExtra("imageAnimals", fakeListImageUrls as java.io.Serializable)
+                  putExtra("nameAnimals", fakeListNames as java.io.Serializable)
+                  putExtra("descriptionAnimals", fakeListDescriptions as java.io.Serializable)
+              }
+          }
+      
+          internal fun TextView.assertAppearanceMaterialBody1(idString: String) {
+              /* android:android:textAllCaps = false     android:android:textSize = 16sp */
+      
+              val expectedAllCaps = false
+              val expectedSize = 16.0f
+              val allCaps = this.isAllCaps
+              val textSize = this.textSize
+              val errorMessageFmt =
+                  "expected TextView with id $idString, to be styled with " +
+                          "TextAppearance.MaterialComponents.Body1. On property %s"
+              assertEquals(errorMessageFmt.format("textAllCaps"), expectedAllCaps, allCaps)
+              assertEquals(errorMessageFmt.format("textSize"), expectedSize, textSize)
+          }
+      
+          internal fun TextView.assertAppearanceMaterialBody2(idString: String) {
+              val expectedAllCaps = false
+              val expectedSize = 14.0f
+              val allCaps = this.isAllCaps
+              val textSize = this.textSize
+              val errorMessageFmt =
+                  "expected TextView with id $idString, to be styled with " +
+                          "TextAppearance.MaterialComponents.Body2. On property %s"
+              assertEquals(errorMessageFmt.format("textAllCaps"), expectedAllCaps, allCaps)
+              assertEquals(errorMessageFmt.format("textSize"), expectedSize, textSize)
+          }
+      
+          internal fun TextView.assertFontFamily(idString: String, expectedFontFamily: String) {
+              val errorMessage =
+                  "expected TextView with id $idString, to be styled with fontFamily"
+      
+              val shadowTypeface = shadowOf(typeface)
+              val actualFontFamily = shadowTypeface.fontDescription.familyName
+              assertEquals(errorMessage, expectedFontFamily, actualFontFamily)
+          }
+      
+          internal fun TextView.assertTextStyle(idString: String,expectedStyle: Int){
+              val errorMessage =
+                  "expected TextView with id $idString, to be styled with textStyle"
+              val shadowTypeface = shadowOf(typeface)
+              val actualStyle = shadowTypeface.fontDescription.style
+              assertEquals(errorMessage, expectedStyle, actualStyle)
+          }
+      
+          internal fun CardView.assertCornerRadius(expectedRadius : Float) {
+              val radius = this.radius
+              val errorMessage = "expected $expectedRadius with CardView, " +
+                      "but was $radius"
+              assertEquals(errorMessage, expectedRadius, radius)
+      
+          }
+          internal fun Drawable?.assertEquals(
+              message: String, expectedResourceId: Int, expectedResourceIdString: String
+          ) {
+      
+              val shadowDrawable = this?.let { shadowOf(it) }
+              val actualResourceId = shadowDrawable?.createdFromResId
+              val errorMessage = "$message " +
+                      "expected $expectedResourceIdString with id $expectedResourceId, " +
+                      "but was _ with id $actualResourceId"
+              Assert.assertTrue(errorMessage, actualResourceId == expectedResourceId)
+          }
+      
+          internal fun TextView.assertText(
+              expectedText: String,
+              idString: String,
+              caseDescription: String) {
+      
+              val actualText = text.toString()
+              val message = "$caseDescription, on property text of TextView with id $idString"
+      
+              assertEquals(message, expectedText, actualText)
+          }
+      
+          internal fun TabLayout.clickTabAndRun(index: Int) {
+              selectTab(getTabAt(index))
+              shadowLooper.idleFor(500, TimeUnit.MILLISECONDS)
+          }
+          internal fun CardView.assertElevation(expectedElevation:Float){
+              val actualElevation = cardElevation
+              val message = "CardView Elevation value is"
+              assertEquals(message,expectedElevation,actualElevation)
+          }
+      }
+    learner_created: false
+  - name: src/test/java/org/hyperskill/aquarium/Stage1UnitTest.kt
+    visible: false
+    text: "package org.hyperskill.aquarium\n\nimport android.content.Intent\nimport\
+    \ org.hyperskill.aquarium.internals.AquariumTest\nimport org.hyperskill.aquarium.internals.data.AquariumFakeData.fakeListDescriptions\n\
+    import org.hyperskill.aquarium.internals.data.AquariumFakeData.fakeListImageResources\n\
+    import org.hyperskill.aquarium.internals.data.AquariumFakeData.fakeListNames\n\
+    import org.hyperskill.aquarium.internals.screen.PageScreen\nimport org.junit.FixMethodOrder\n\
+    import org.junit.Test\nimport org.junit.runner.RunWith\nimport org.junit.runners.MethodSorters\n\
+    import org.robolectric.RobolectricTestRunner\n\n@RunWith(RobolectricTestRunner::class)\n\
+    @FixMethodOrder(MethodSorters.NAME_ASCENDING)\nclass Stage1UnitTest : AquariumTest<MainActivity>(MainActivity::class.java)\
+    \ {\n\n\n    @Test\n    fun test00_checkCardView() {\n        testActivity(arguments\
+    \ = stage1Args) {\n            PageScreen(this, initViews = false).apply {\n \
+    \               cardView\n            }\n        }\n    }\n\n    @Test\n    fun\
+    \ test01_checkNestedScrollView() {\n        testActivity(arguments = stage1Args)\
+    \ {\n            PageScreen(this, initViews = false).apply {\n               \
+    \ nestedScrollView\n            }\n        }\n    }\n\n    @Test\n    fun test02_checkImageView()\
+    \ {\n        testActivity(arguments = stage1Args) {\n            PageScreen(this,\
+    \ initViews = false).apply {\n                imageView\n            }\n     \
+    \   }\n    }\n\n    @Test\n    fun test03_checkTvName() {\n        testActivity(arguments\
+    \ = stage1Args) {\n            PageScreen(this, initViews = false).apply {\n \
+    \               tvName\n\n            }\n        }\n    }\n\n    @Test\n    fun\
+    \ test04_checkTvDescription(){\n        testActivity(arguments = stage1Args) {\n\
+    \            PageScreen(this, initViews = false).apply {\n                tvDescription\n\
+    \            }\n        }\n    }\n\n    @Test\n    fun test05_checkPageDefaultContent(){\n\
+    \        val images = fakeListImageResources.take(1)\n        val names = fakeListNames.take(1)\n\
+    \        val descriptions = fakeListDescriptions.take(1)\n\n\n        testActivity\
+    \ {\n            PageScreen(this).apply {\n                assertPageTextContent(\n\
+    \                    caseDescription = \"When using default content\",\n     \
+    \               expectedName = names[0],\n                    expectedDescription\
+    \ = descriptions[0]\n                )\n\n                assertImageViewResource(R.drawable.image1,\
+    \ \"image1\")\n                assertImageViewScale()\n            }\n       \
+    \ }\n    }\n\n    @Test\n    fun test06_checkPageCustomContent(){\n        val\
+    \ images = fakeListImageResources.take(2)\n        val names = fakeListNames.drop(1)\n\
+    \        val descriptions = fakeListDescriptions.drop(1)\n        \n        val\
+    \ args = Intent().apply {\n            putExtra(\"imageAnimals\", images as java.io.Serializable)\n\
+    \            putExtra(\"nameAnimals\", names as java.io.Serializable)\n      \
+    \      putExtra(\"descriptionAnimals\", descriptions as java.io.Serializable)\n\
+    \        }\n        \n        testActivity(arguments = args) {\n            PageScreen(this).apply\
+    \ {\n                assertPageTextContent(\n                    caseDescription\
+    \ = \"When using custom content passed through intent.extras\",\n            \
+    \        expectedName = names[0],\n                    expectedDescription = descriptions[0]\n\
+    \                )\n\n                assertImageViewResource(R.drawable.image1,\
+    \ \"image1\")\n                assertImageViewScale()\n            }\n       \
+    \ }\n    }\n}"
+    learner_created: false
+  - name: build.gradle
+    visible: true
+    text: |-
+      apply plugin: 'com.android.application'
+      apply plugin: 'kotlin-android'
+      
+      android {
+          compileSdkVersion hs.android.compileSdkVersion
+      
+          defaultConfig {
+      
+              applicationId "org.hyperskill.aquarium"
+              minSdkVersion hs.android.minSdkVersion
+              targetSdkVersion hs.android.targetSdkVersion
+              versionCode 1
+              versionName '1.0'
+          }
+      
+          buildFeatures {
+              viewBinding true
+          }
+      }
+      
+      dependencies {
+          def kotlinVersion = hs.android.kotlinVersion
+          implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+      
+          def coreKtx = hs.android.lib.coreKtx
+          implementation "androidx.core:core-ktx:$coreKtx"
+      
+          def appCompat = hs.android.lib.appCompat
+          implementation "androidx.appcompat:appcompat:$appCompat"
+      
+          def constraintLayout = hs.android.lib.constraintLayout
+          implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
+      
+          def material = hs.android.lib.material
+          implementation "com.google.android.material:material:$material"
+      
+          implementation 'com.squareup.picasso:picasso:2.8'
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/33388#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Thu, 30 May 2024 14:36:43 UTC"
+record: -1

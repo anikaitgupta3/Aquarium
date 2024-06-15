@@ -1259,6 +1259,15 @@ files:
           }
       }
     learner_created: false
+  - name: src/main/res/layout/page_item.xml
+    visible: true
+    learner_created: true
+  - name: src/main/java/org/hyperskill/aquarium/YourAdapterName.kt
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/33390#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sun, 02 Jun 2024 11:23:19 UTC"
+record: 8
